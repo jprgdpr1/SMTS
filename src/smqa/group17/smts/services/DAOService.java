@@ -13,5 +13,18 @@ public class DAOService {
             }
         }
     }
+
+  private static double getAvailableFunds(Connection connection, int userId) throws SQLException {
+        String query = "SELECT available_funds FROM users WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, userId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("available_funds");
+                }
+            }
+        }
+        return 0.0; // Default if user not found or other error
+    }
   
 }
