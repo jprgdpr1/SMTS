@@ -39,5 +39,24 @@ public class DAOService {
         }
         return 0.0; // Default if stock not found or other error
     }
-  
+
+  private static void performStockPurchase(Connection connection, int userId, String stockSymbol,
+                                             int quantity, double totalPrice) throws SQLException {
+        // Deduct funds from user's account
+        String deductFundsQuery = "UPDATE users SET available_funds = available_funds - ? WHERE id = ?";
+        try (PreparedStatement deductFundsStatement = connection.prepareStatement(deductFundsQuery)) {
+            deductFundsStatement.setDouble(1, totalPrice);
+            deductFundsStatement.setInt(2, userId);
+            deductFundsStatement.executeUpdate();
+        }
+        // Add stocks to user's portfolio
+        String addStocksQuery = "INSERT INTO user_stocks (user_id, stock_symbol, quantity) VALUES (?, ?, ?)";
+        try (PreparedStatement addStocksStatement = connection.prepareStatement(addStocksQuery)) {
+            addStocksStatement.setInt(1, userId);
+            addStocksStatement.setString(2, stockSymbol);
+            addStocksStatement.setInt(3, quantity);
+            addStocksStatement.executeUpdate();
+        }
+    }
+}
 }
