@@ -26,5 +26,18 @@ public class DAOService {
         }
         return 0.0; // Default if user not found or other error
     }
+
+  private static double getStockPrice(Connection connection, String stockSymbol) throws SQLException {
+        String query = "SELECT price FROM stocks WHERE symbol = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, stockSymbol);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getDouble("price");
+                }
+            }
+        }
+        return 0.0; // Default if stock not found or other error
+    }
   
 }
