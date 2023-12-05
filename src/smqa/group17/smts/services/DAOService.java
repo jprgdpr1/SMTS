@@ -300,4 +300,62 @@ public List<String> searchStocks(String category, double minPrice, double maxPri
         System.out.println("Registration successful! Welcome, " + username + "!");
     }
 }
+ public void registerNewAccount() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== User Registration ===");
+
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        // Check if the username already exists
+        if (userAccounts.containsKey(username)) {
+            System.out.println("Username already exists. Please choose a different one.");
+            return;
+        }
+
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        // Save the new user account
+        userAccounts.put(username, password);
+
+        System.out.println("Registration successful! Welcome, " + username + "!");
+    }
+
+    public void loginUser() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== User Login ===");
+
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        // Check if the username exists
+        if (!userAccounts.containsKey(username)) {
+            System.out.println("Username does not exist. Please register first.");
+            return;
+        }
+
+        System.out.print("Enter password: ");
+        String enteredPassword = scanner.nextLine();
+
+        // Check if the entered password matches the stored password for the username
+        if (enteredPassword.equals(userAccounts.get(username))) {
+            // Generate a session token (replace with a more secure approach)
+            String sessionToken = generateSessionToken();
+            loggedInUsers.put(username, sessionToken);
+
+            System.out.println("Login successful! Welcome, " + username + "!");
+            System.out.println("Your session token is: " + sessionToken);
+        } else {
+            System.out.println("Incorrect password. Please try again.");
+        }
+    }
+
+    private String generateSessionToken() {
+        // Replace with a more secure session token generation approach in a real application
+        return "sample_session_token";
+    }
+}
 }
