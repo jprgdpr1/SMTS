@@ -277,4 +277,27 @@ public List<String> searchStocks(String category, double minPrice, double maxPri
         }
         return wishList;
     }
+    public void registerNewAccount() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== User Registration ===");
+
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        // Check if the username already exists
+        if (userAccounts.containsKey(username)) {
+            System.out.println("Username already exists. Please choose a different one.");
+            return;
+        }
+
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        // Save the new user account
+        userAccounts.put(username, password);
+
+        System.out.println("Registration successful! Welcome, " + username + "!");
+    }
+}
 }
