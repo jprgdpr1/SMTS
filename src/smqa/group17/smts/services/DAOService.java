@@ -1,6 +1,17 @@
 package smqa.group17.smts.services;
 
 public class DAOService {
+  public static void main(String[] args) {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new PortfolioPerformanceChecker(), 0, 60000);
+    }
+    
+  static class PortfolioPerformanceChecker extends TimerTask {
+      public void run() {
+          checkPortfolioPerformance();
+      }
+  }
+  
   public static void displayAvailableStocks() {
         try {
             Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
@@ -27,6 +38,38 @@ public class DAOService {
         }
     }
 
+  public static void checkPortfolioPerformance() {
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+            String query = "SELECT user_id, stock_symbol, quantity, purchase_price FROM portfolios";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("user_id");
+                String stockSymbol = resultSet.getString("stock_symbol");
+                int quantity = resultSet.getInt("quantity");
+                double purchasePrice = resultSet.getDouble("purchase_price");
+                double currentStockPrice = getStockPrice(stockSymbol);
+                double currentPortfolioValue = quantity * currentStockPrice;
+                double percentageChange = ((currentPortfolioValue - purchasePrice) / purchasePrice) * 100;
+                if (Math.abs(percentageChange) >= 10.0) {
+                    System.out.println("Alert: Significant change in portfolio performance for user " + userId);
+                    System.out.println("Current Portfolio Value: $" + currentPortfolioValue);
+                    System.out.println("Percentage Change: " + percentageChange + "%");
+                    System.out.println("------------------------------");
+                }
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+  private static double getStockPrice(String stockSymbol) {
+      return Math.random() * 100; 
+  }
+  
   public static void addToWishList() {
         try {
             Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
