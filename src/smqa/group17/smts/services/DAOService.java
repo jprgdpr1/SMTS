@@ -425,4 +425,30 @@ public void updateAccountInformation() {
         }
     }
 }
+public void secureLogout() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== Secure Logout ===");
+
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        // Check if the username exists
+        if (!userAccounts.containsKey(username)) {
+            System.out.println("Username does not exist. Please register first.");
+            return;
+        }
+
+        // Check if the user is logged in (replace with a more secure session management approach)
+        if (!loggedInUsers.containsKey(username)) {
+            System.out.println("You are not logged in.");
+            return;
+        }
+
+        // Remove the user's session token upon logout
+        loggedInUsers.remove(username);
+
+        System.out.println("Logout successful. Goodbye, " + username + "!");
+    }
+
 }
