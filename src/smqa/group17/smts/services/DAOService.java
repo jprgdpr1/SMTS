@@ -24,6 +24,7 @@ public class DAOService {
                 }
             }
         }
+    
         return 0.0; // Default if user not found or other error
     }
 
@@ -57,6 +58,34 @@ public class DAOService {
             addStocksStatement.setInt(3, quantity);
             addStocksStatement.executeUpdate();
         }
+    }
+    public void generateReports() {
+        generateUserActivityReport();
+        generateSystemPerformanceReport();
+    }
+    private void generateUserActivityReport() {
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            // Replace 'your_user_activity_table' with the actual name of your user activity table
+            String userActivityQuery = "SELECT user_id, activity_type, timestamp FROM your_user_activity_table";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(userActivityQuery)) {
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    System.out.println("User Activity Report:");
+                    while (resultSet.next()) {
+                        int userId = resultSet.getInt("user_id");
+                        String activityType = resultSet.getString("activity_type");
+                        String timestamp = resultSet.getString("timestamp");
+                        System.out.println("User ID: " + userId + ", Activity Type: " + activityType + ", Timestamp: " + timestamp);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private void generateSystemPerformanceReport() {
+        // Implement system performance report generation logic here
+        // You can collect data such as CPU usage, memory usage, etc. and print or log the report
+        System.out.println("System Performance Report: (Implement your logic here)");
     }
 }
 }
