@@ -88,4 +88,25 @@ public class DAOService {
         System.out.println("System Performance Report: (Implement your logic here)");
     }
 }
+public List<String> searchStocks(String category, double minPrice, double maxPrice) {
+        List<String> matchingStocks = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            // You need to replace 'your_stock_table' with the actual name of your stock table
+            String query = "SELECT stock_symbol FROM your_stock_table WHERE category = ? AND price BETWEEN ? AND ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, category);
+                preparedStatement.setDouble(2, minPrice);
+                preparedStatement.setDouble(3, maxPrice);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String stockSymbol = resultSet.getString("stock_symbol");
+                        matchingStocks.add(stockSymbol);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return matchingStocks;
+    }
 }
