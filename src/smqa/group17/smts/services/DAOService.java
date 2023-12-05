@@ -4,11 +4,38 @@ public class DAOService {
   public static void main(String[] args) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new PortfolioPerformanceChecker(), 0, 60000);
-    }
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(StockMarketSystem::checkMaintenanceSchedule, 0, 1, TimeUnit.HOURS);
+  }
     
   static class PortfolioPerformanceChecker extends TimerTask {
       public void run() {
           checkPortfolioPerformance();
+      }
+  }
+
+  public static void checkMaintenanceSchedule() {
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            String query = "SELECT * FROM maintenance_schedule WHERE start_time > ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setObject(1, currentDateTime);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String maintenanceMessage = resultSet.getString("message");
+                LocalDateTime startTime = resultSet.getObject("start_time", LocalDateTime.class);
+                long timeUntilMaintenance = java.time.Duration.between(currentDateTime, startTime).toHours();
+                System.out.println("Maintenance Notification:");
+                System.out.println("Scheduled Maintenance in " + timeUntilMaintenance + " hours.");
+                System.out.println("Message: " + maintenanceMessage);
+                System.out.println("------------------------------");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
       }
   }
   
