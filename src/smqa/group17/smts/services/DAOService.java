@@ -358,4 +358,71 @@ public List<String> searchStocks(String category, double minPrice, double maxPri
         return "sample_session_token";
     }
 }
+public void updateAccountInformation() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("=== Update Account Information ===");
+
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+
+        // Check if the username exists
+        if (!userAccounts.containsKey(username)) {
+            System.out.println("Username does not exist. Please register first.");
+            return;
+        }
+
+        // Check if the user is logged in (replace with a more secure session management approach)
+        if (!loggedInUsers.containsKey(username)) {
+            System.out.println("Please log in first to update your account information.");
+            return;
+        }
+
+        User user = userAccounts.get(username);
+
+        System.out.println("Current Account Information:");
+        System.out.println("Username: " + user.getUsername());
+        System.out.println("Email: " + user.getEmail()); // Replace with actual user properties
+
+        System.out.print("Enter new email (or press Enter to keep the current one): ");
+        String newEmail = scanner.nextLine();
+
+        // Update email if a new one is provided
+        if (!newEmail.isEmpty()) {
+            user.setEmail(newEmail);
+            System.out.println("Email updated successfully.");
+        }
+
+        // You can add more fields to update as needed (e.g., password, security settings, etc.)
+
+        System.out.println("Account information updated successfully.");
+    }
+
+    private String generateSessionToken() {
+        // ... (same as previous example)
+    }
+
+    // Placeholder User class for storing user information
+    private static class User {
+        private String username;
+        private String email;
+
+        public User(String username, String email) {
+            this.username = username;
+            this.email = email;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+    }
+}
 }
