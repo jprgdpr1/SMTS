@@ -26,6 +26,37 @@ public class DAOService {
             e.printStackTrace();
         }
     }
+
+  public static void addToWishList() {
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter stock symbol:");
+            String stockSymbol = scanner.nextLine();
+            System.out.println("Enter company name:");
+            String companyName = scanner.nextLine();
+            System.out.println("Enter stock price:");
+            double stockPrice = scanner.nextDouble();
+            String query = "INSERT INTO wishlist (user_id, stock_symbol, company_name, price) VALUES (?, ?, ?, ?)";
+            
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            int userId = 1;
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, stockSymbol);
+            preparedStatement.setString(3, companyName);
+            preparedStatement.setDouble(4, stockPrice);
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Stock added to wishlist successfully!");
+            } else {
+                System.out.println("Failed to add stock to wishlist.");
+            }
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
   
   private static double getAvailableFunds(Connection connection, int userId) throws SQLException {
         String query = "SELECT available_funds FROM users WHERE id = ?";
