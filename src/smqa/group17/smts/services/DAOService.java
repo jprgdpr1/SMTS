@@ -109,4 +109,22 @@ public List<String> searchStocks(String category, double minPrice, double maxPri
         }
         return matchingStocks;
     }
+    public List<String> getWishList(int userId) {
+        List<String> wishList = new ArrayList<>();
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
+            String query = "SELECT stock_symbol FROM wishlist WHERE user_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, userId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String stockSymbol = resultSet.getString("stock_symbol");
+                        wishList.add(stockSymbol);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return wishList;
+    }
 }
