@@ -1,19 +1,32 @@
 package smqa.group17.smts.services;
 
 public class DAOService {
-
-  private static void displayAvailableStocks(Connection connection) throws SQLException {
-        String query = "SELECT * FROM stocks";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            System.out.println("Available Stocks:");
-            System.out.println("Stock Symbol\tStock Price");
+  public static void displayAvailableStocks() {
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+            String query = "SELECT * FROM stocks";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            System.out.println("Stocks available:");
             while (resultSet.next()) {
                 System.out.println(resultSet.getString("symbol") + "\t\t\t" + resultSet.getDouble("price"));
+                String stockSymbol = resultSet.getString("symbol");
+                String companyName = resultSet.getString("company_name");
+                double stockPrice = resultSet.getDouble("price");
+                System.out.println("Symbol: " + stockSymbol);
+                System.out.println("Company Name: " + companyName);
+                System.out.println("Price: $" + stockPrice);
+                System.out.println("------------------------------");
             }
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
-
+  
   private static double getAvailableFunds(Connection connection, int userId) throws SQLException {
         String query = "SELECT available_funds FROM users WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
