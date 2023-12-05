@@ -6,6 +6,7 @@ public class DAOService {
         timer.scheduleAtFixedRate(new PortfolioPerformanceChecker(), 0, 60000);
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(StockMarketSystem::checkMaintenanceSchedule, 0, 1, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(StockMarketSystem::checkStockAlerts, 0, 1, TimeUnit.MINUTES);
   }
     
   static class PortfolioPerformanceChecker extends TimerTask {
@@ -64,6 +65,41 @@ public class DAOService {
             e.printStackTrace();
         }
     }
+
+  public static void checkStockAlerts() {
+        try {
+            Connection connection = DriverManager.getConnection(JDBC_URL, DB_USER, DB_PASSWORD);
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            String query = "SELECT * FROM stock_alerts WHERE alert_time <= ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setObject(1, currentDateTime);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("user_id");
+                String stockSymbol = resultSet.getString("stock_symbol");
+                double targetPrice = resultSet.getDouble("target_price");
+                LocalDateTime alertTime = resultSet.getObject("alert_time", LocalDateTime.class);
+                double currentStockPrice = getStockPrice(stockSymbol);
+                if (currentStockPrice >= targetPrice) {
+                    System.out.println("Alert for user " + userId + ":");
+                    System.out.println("Stock Symbol: " + stockSymbol);
+                    System.out.println("Target Price: $" + targetPrice);
+                    System.out.println("Current Stock Price: $" + currentStockPrice);
+                    System.out.println("Alert Time: " + alertTime);
+                    System.out.println("------------------------------");
+                }
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+  
+  private static double getStockPrice(String stockSymbol) {
+      return Math.random() * 100;
+  }
 
   public static void checkPortfolioPerformance() {
         try {
