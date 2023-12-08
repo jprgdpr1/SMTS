@@ -9,9 +9,10 @@ import smqa.group17.smts.model.User;
 
 public class DashboardController {
 
-	public static void addStockToWishlist(String stockSymbol, String username) {
+	public static String addStockToWishlist(String stockSymbol, String username) {
 		// TODO Auto-generated method stub
 		DatabaseController.addStockToWishListForUser(stockSymbol, username);
+		return stockSymbol + " added to wishlist of user " + username;
 	}
 
 	public static List<Stock> getAllStocks() {
@@ -25,30 +26,36 @@ public class DashboardController {
 		
 	}
 
-	public static void updateFundsForUser(String username, double newFunds) {
+	public static String updateFundsForUser(String username, double newFunds) {
 		// TODO Auto-generated method stub
 		DatabaseController.updateFundsForUser(username, newFunds);
+		return newFunds + " has been added to funds of " + username;
 	}
 
-	public static void withdrawFunds(String username, double inputFund) {
+	public static String withdrawFunds(String username, double inputFund) {
 		// TODO Auto-generated method stub
 		User user = DashboardController.getUserDataForUserId(username);
 		if(inputFund > user.getFunds())
+		{
         	System.out.println("You do not have enough Fund balance to withdraw GBP " + inputFund);
+        	return "You do not have enough Fund balance to withdraw GBP " + inputFund;
+		}
         else
         {
         	double newFunds = user.getFunds() - inputFund;
         	DashboardController.updateFundsForUser(username, newFunds);
         	System.out.println("Your new Fund Balance: " + newFunds);
+        	return "Funds Withdrawn";
         }
 	}
 
-	public static void buyStock(String username, String stockSymbol, int numberOfShares) {
+	public static String buyStock(String username, String stockSymbol, int numberOfShares) {
 		// TODO Auto-generated method stub
 		User user = DashboardController.getUserDataForUserId(username);
 		Stock stockToBuy = DatabaseController.getStockDataForSymbol(stockSymbol);
 		
 		double fundsRequiredToBuy = stockToBuy.getPrice() * numberOfShares;
+		String response = "";
 		
 		if(user.getFunds() > fundsRequiredToBuy)
 		{
@@ -64,7 +71,7 @@ public class DashboardController {
 				double pnl = calculateProfitLoss(newBuyPrice, newCurrentPrice);
 				DatabaseController.updateOrder(userName, stocksymbol, newNumberOfShares, newBuyPrice, newCurrentPrice, pnl);
 				System.out.println(numberOfShares + " shares of " + stockSymbol + " has been added to your Portfolio");
-				
+				response = numberOfShares + " shares of " + stockSymbol + " has been added to your Portfolio";
 			}
 			else
 			{
@@ -77,6 +84,7 @@ public class DashboardController {
 				double pnl = 0;
 				DatabaseController.addStockToProtfolio(orderID, userName, stocksymbol, numberofshares, buyPrice, currentPrice, pnl);
 				System.out.println(numberOfShares + " shares of " + stockSymbol + " has been added to your Portfolio");
+				response = numberOfShares + " shares of " + stockSymbol + " has been added to your Portfolio";
 			}
 
 			//Update user details
@@ -90,21 +98,23 @@ public class DashboardController {
 		else
 		{
 			System.out.println("You do not have enough balance to complete this buy " + numberOfShares + " shares of stock " + stockSymbol + "("+ stockToBuy.getName() +")");
+			response = "You do not have enough balance to complete this buy " + numberOfShares + " shares of stock " + stockSymbol + ")";
 		}
+		return response;
 	}
 
-	private static double calculateProfitLoss(double buyPrice, double currentPrice) {
+	public static double calculateProfitLoss(double buyPrice, double currentPrice) {
 		// TODO Auto-generated method stub
 		double profitLossPercentage = ((currentPrice - buyPrice) / buyPrice) * 100;
-        return profitLossPercentage;
+        return profitLossPercentage; 
 	}
 
-	private static double getAverage(double value1, double value2) {
+	public static double getAverage(double value1, double value2) {
 		// TODO Auto-generated method stub
 		return (value1 + value2)/2;
 	}
 
-	private static String generateRandom6CharacterID() {
+	public static String generateRandom6CharacterID() {
 		// TODO Auto-generated method stub
 		final String ALPHABET = "0123456789";
 	    final SecureRandom random = new SecureRandom();
@@ -122,10 +132,11 @@ public class DashboardController {
 		return DatabaseController.getAllOrdersForUserName(username);
 	}
 
-	public static void sellStock(String username, String stockToSell, int numberOfShares) {
+	public static String sellStock(String username, String stockToSell, int numberOfShares) {
 		// TODO Auto-generated method stub
 		List<Order> orderList = DatabaseController.getAllOrdersForUserName(username);
 		boolean flag = true;
+		String response = "";
 		for(Order order : orderList)
 		{
 			if(order.getStockSymbol().equalsIgnoreCase(stockToSell))
@@ -147,6 +158,7 @@ public class DashboardController {
 					double newPNL = calculateProfitLoss(newInvested, newCurrent);
 					
 					DatabaseController.updateUserPnL(username, newInvested, newCurrent, newFunds, newPNL);
+					response = stockToSell+ " has been sold successfully";
 				}
 				else if(numberOfShares < order.getNumberOfShares())
 				{
@@ -165,13 +177,21 @@ public class DashboardController {
 					double newPNL = calculateProfitLoss(newInvested, newCurrent);
 					
 					DatabaseController.updateUserPnL(username, newInvested, newCurrent, newFunds, newPNL);
+					response = stockToSell+ " has been sold successfully";
 				}
 				else
+				{
 					System.out.println("You only have " + order.getNumberOfShares() + " shares of " + stockToSell + " in your Portfolio");
+					response = "You only have " + order.getNumberOfShares() + " shares of " + stockToSell + " in your Portfolio";
+				}
 			}
 		}
 		if(flag)
+		{
 			System.out.println("You do not own any " + stockToSell + " shares.");
+			response = "You do not own any " + stockToSell + " shares.";
+		}
+		return response;
 	}
 
 	public static List<Stock> getAllStocksInWishlist(String username) {
@@ -179,10 +199,11 @@ public class DashboardController {
 		return DatabaseController.getAllStocksInWishlist(username);
 	}
 
-	public static void changeStockPrices() {
+	public static String changeStockPrices() {
 		// TODO Auto-generated method stub
 		//Update stock table
 		DatabaseController.changeStockPrices();
+		return "Stock Prices changed";
 	}
 
 }

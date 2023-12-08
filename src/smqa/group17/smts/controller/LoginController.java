@@ -2,7 +2,7 @@ package smqa.group17.smts.controller;
 
 public class LoginController {
 
-	public static boolean isAlreadyRegistered(String username) {
+	public static boolean isAlreadyRegistered(String username) throws Exception{
 		return DatabaseController.isAlreadyRegistered(username);
 	}
 
@@ -19,11 +19,11 @@ public class LoginController {
 		
 	}
 
-	public static void register(String newUsername, String newPassword) {
+	public static String register(String newUsername, String newPassword) {
 		
 		String encryptedPassword = EncryptionController.encrypt(newPassword);
 		DatabaseController.createUser(newUsername, encryptedPassword);
-        
+        return "Registration Successfull";
 	}
 
 }

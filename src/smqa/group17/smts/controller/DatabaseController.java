@@ -26,54 +26,33 @@ public class DatabaseController {
             // Open a connection
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
 
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            // Handle errors for Class.forName
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // Handle errors for JDBC
         }
-
         return connection;
     }
 
-	public static boolean isAlreadyRegistered(String username) {
+	public static boolean isAlreadyRegistered(String username) throws SQLException{
 		// TODO Auto-generated method stub
 		Connection connection = getConnection();
 		boolean exists = false;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
 
-        try {
-            // SQL query to check if the username exists in the 'users' table
-            String query = "SELECT COUNT(*) FROM users WHERE USER_NAME = ?";
+        String query = "SELECT COUNT(*) FROM users WHERE USER_NAME = ?";
             
-            // Create a prepared statement
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, username);
+        // Create a prepared statement
+        preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, username);
 
-            // Execute the query
-            resultSet = preparedStatement.executeQuery();
+        // Execute the query
+        resultSet = preparedStatement.executeQuery();
 
-            // If the query returns a result
-            if (resultSet.next()) {
-                // Get the count of occurrences of the username
-                int count = resultSet.getInt(1);
-                exists = count > 0; // Set exists to true if count > 0
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        // If the query returns a result
+        if (resultSet.next()) {
+            // Get the count of occurrences of the username
+            int count = resultSet.getInt(1);
+            exists = count > 0; // Set exists to true if count > 0
         }
         return exists;
 	}
@@ -95,18 +74,7 @@ public class DatabaseController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
         return password;
 	}
 
@@ -124,15 +92,7 @@ public class DatabaseController {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
 	}
 
 	public static List<Stock> getAllStocks() {
