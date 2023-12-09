@@ -1,0 +1,13 @@
+Whitebox Test Cases
+1. Open Whitebox folder
+2. View all Whitebox test cases inside Test Cases folder
+3. Use the bash script in TestCoverage.sh to generate coverage
+4. Unfortunately, this script will not be accurate if you execute in your computer since we have used a local MYSQL database and most test cases will fail unable to connect with the database.
+5. However, we have generated the report and have attached it as well. Kindly view the report under Our Report folder.
+
+Blackbox Test Cases
+1. Open Blackbox folder
+2. View all Blackbox test cases inside Test Cases folder
+3. Use the bash script in TestCoverage.sh to generate coverage
+4. Unfortunately, this script will not be accurate if you execute in your computer since we have used a local MYSQL database and most test cases will fail unable to connect with the database.
+5. However, we have generated the report and have attached it as well. Kindly view the report under Our Report folder.
